@@ -1,0 +1,332 @@
+/* ==========================================================================
+   ARGAND — design tokens
+   ========================================================================== */
+:root {
+  --bg-void:      #070b14;
+  --bg-panel:     rgba(20, 25, 40, 0.55);
+  --bg-panel-alt: rgba(20, 25, 40, 0.35);
+  --border-soft:  rgba(140, 160, 220, 0.16);
+  --cyan:         #4deaff;
+  --cyan-dim:     rgba(77, 234, 255, 0.35);
+  --violet:       #9b6bff;
+  --violet-dim:   rgba(155, 107, 255, 0.35);
+  --danger:       #ff5470;
+  --text-primary: #eef1f8;
+  --text-muted:   #7d869c;
+
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-body:    'Inter', sans-serif;
+  --font-mono:    'JetBrains Mono', monospace;
+
+  --radius: 14px;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--bg-void);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+}
+
+/* ==========================================================================
+   Ambient background — faint circuit grid + radial glow
+   ========================================================================== */
+.bg-grid {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-image:
+    linear-gradient(rgba(140,160,220,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(140,160,220,0.05) 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 20%, black 40%, transparent 90%);
+}
+
+.bg-glow {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(circle at 20% 10%, rgba(77,234,255,0.14), transparent 45%),
+    radial-gradient(circle at 85% 30%, rgba(155,107,255,0.14), transparent 45%);
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   Header
+   ========================================================================== */
+.site-header {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  padding: 3rem 1.5rem 1.5rem;
+}
+
+.brand { display: flex; align-items: center; gap: 0.75rem; }
+
+.brand-mark {
+  font-size: 1.4rem;
+  color: var(--cyan);
+  text-shadow: 0 0 14px var(--cyan-dim);
+}
+
+.brand-text h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.6rem;
+  letter-spacing: 0.12em;
+  background: linear-gradient(90deg, var(--cyan), var(--violet));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.brand-text p {
+  margin: 0.1rem 0 0;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+/* ==========================================================================
+   Layout
+   ========================================================================== */
+.layout {
+  position: relative;
+  z-index: 1;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 1.5rem 3rem;
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 800px) {
+  .layout { grid-template-columns: 1fr; }
+}
+
+.panel {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  backdrop-filter: blur(18px);
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.02) inset, 0 20px 60px rgba(0,0,0,0.35);
+}
+
+/* ==========================================================================
+   Display
+   ========================================================================== */
+.display {
+  background: rgba(6, 9, 16, 0.6);
+  border: 1px solid var(--border-soft);
+  border-radius: 10px;
+  padding: 1.25rem 1.25rem 1rem;
+  margin-bottom: 1.25rem;
+  min-height: 92px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 0.3rem;
+}
+
+.display-expr {
+  font-family: var(--font-mono);
+  font-size: 1.15rem;
+  color: var(--text-muted);
+  word-break: break-all;
+  min-height: 1.4em;
+}
+
+.display-result {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 1.9rem;
+  color: var(--cyan);
+  text-shadow: 0 0 18px var(--cyan-dim);
+  min-height: 1.3em;
+  word-break: break-all;
+}
+
+.display-result.error {
+  color: var(--danger);
+  text-shadow: 0 0 18px rgba(255, 84, 112, 0.4);
+  font-size: 1.1rem;
+  font-family: var(--font-body);
+  font-weight: 500;
+}
+
+.display-result .polar {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--violet);
+  text-shadow: 0 0 14px var(--violet-dim);
+  margin-top: 0.15rem;
+}
+
+/* ==========================================================================
+   Keypad
+   ========================================================================== */
+.keypad {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-auto-rows: 52px;
+  gap: 0.5rem;
+}
+
+.key {
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border-soft);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.08s ease, border-color 0.15s ease, background 0.15s ease;
+}
+
+.key:hover { border-color: rgba(140,160,220,0.4); background: rgba(255,255,255,0.06); }
+.key:active { transform: scale(0.95); }
+
+.key--op {
+  color: var(--violet);
+  border-color: var(--violet-dim);
+}
+
+.key--fn {
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.key--imag {
+  color: var(--cyan);
+  border-color: var(--cyan-dim);
+  font-style: italic;
+  font-weight: 700;
+}
+
+.key[data-action="clear"],
+.key[data-action="back"] {
+  color: var(--danger);
+  border-color: rgba(255, 84, 112, 0.3);
+}
+
+.key--eq {
+  grid-row: span 2;
+  font-size: 1.4rem;
+  color: var(--bg-void);
+  background: linear-gradient(135deg, var(--cyan), var(--violet));
+  border: none;
+  box-shadow: 0 0 24px rgba(77,234,255,0.25);
+}
+
+.key--eq:hover { filter: brightness(1.08); }
+
+.hint {
+  margin: 1.1rem 0 0;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.hint code {
+  font-family: var(--font-mono);
+  color: var(--cyan);
+  background: rgba(77,234,255,0.08);
+  padding: 0.1em 0.4em;
+  border-radius: 4px;
+}
+
+/* ==========================================================================
+   Argand plane panel
+   ========================================================================== */
+.plane-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.plane-head h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  letter-spacing: 0.06em;
+  color: var(--text-primary);
+}
+
+.ghost-btn {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px solid var(--border-soft);
+  border-radius: 6px;
+  padding: 0.3rem 0.6rem;
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.ghost-btn:hover { color: var(--cyan); border-color: var(--cyan-dim); }
+
+#plane {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  display: block;
+}
+
+.history {
+  list-style: none;
+  margin: 1rem 0 0;
+  padding: 0;
+  max-height: 160px;
+  overflow-y: auto;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+}
+
+.history li {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.4rem 0.1rem;
+  border-bottom: 1px solid var(--border-soft);
+  color: var(--text-muted);
+}
+
+.history li:last-child { border-bottom: none; }
+.history li .h-expr { color: var(--text-primary); }
+.history li .h-val { color: var(--cyan); }
+
+/* ==========================================================================
+   Footer
+   ========================================================================== */
+.site-footer {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 1.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.site-footer a { color: var(--cyan); text-decoration: none; }
+.site-footer a:hover { text-decoration: underline; }
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .key { transition: none; }
+}
