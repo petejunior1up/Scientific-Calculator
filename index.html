@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Argand — Complex Number Calculator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="bg-grid"></div>
+<div class="bg-glow"></div>
+
+<header class="site-header">
+  <div class="brand">
+    <span class="brand-mark">◆</span>
+    <div class="brand-text">
+      <h1>ARGAND</h1>
+      <p>complex number calculator</p>
+    </div>
+  </div>
+</header>
+
+<main class="layout">
+
+  <!-- ===================== CALCULATOR PANEL ===================== -->
+  <section class="panel calculator" aria-label="Calculator">
+
+    <div class="display" id="display">
+      <div class="display-expr" id="expr" aria-live="polite">0</div>
+      <div class="display-result" id="result"></div>
+    </div>
+
+    <div class="keypad" id="keypad">
+      <!-- row 1: functions -->
+      <button class="key key--fn" data-action="func" data-value="conj(">conj</button>
+      <button class="key key--fn" data-action="func" data-value="abs(">abs</button>
+      <button class="key key--fn" data-action="func" data-value="arg(">arg</button>
+      <button class="key key--fn" data-action="clear">C</button>
+      <button class="key key--fn" data-action="back" aria-label="Backspace">⌫</button>
+
+      <!-- row 2 -->
+      <button class="key" data-action="insert" data-value="(">(</button>
+      <button class="key" data-action="insert" data-value=")">)</button>
+      <button class="key key--imag" data-action="insert" data-value="i">i</button>
+      <button class="key key--op" data-action="insert" data-value="^">^</button>
+      <button class="key key--op" data-action="insert" data-value="/">÷</button>
+
+      <!-- row 3 -->
+      <button class="key" data-action="insert" data-value="7">7</button>
+      <button class="key" data-action="insert" data-value="8">8</button>
+      <button class="key" data-action="insert" data-value="9">9</button>
+      <button class="key key--op" data-action="insert" data-value="*">×</button>
+      <button class="key key--op" data-action="insert" data-value="-">−</button>
+
+      <!-- row 4 -->
+      <button class="key" data-action="insert" data-value="4">4</button>
+      <button class="key" data-action="insert" data-value="5">5</button>
+      <button class="key" data-action="insert" data-value="6">6</button>
+      <button class="key key--op" data-action="insert" data-value="+">+</button>
+      <button class="key key--eq" data-action="equals" rowspan="2">=</button>
+
+      <!-- row 5 -->
+      <button class="key" data-action="insert" data-value="1">1</button>
+      <button class="key" data-action="insert" data-value="2">2</button>
+      <button class="key" data-action="insert" data-value="3">3</button>
+      <button class="key" data-action="insert" data-value="0">0</button>
+      <button class="key" data-action="insert" data-value=".">.</button>
+    </div>
+
+    <p class="hint">Type expressions like <code>3+4i</code>, <code>(2-i)*(1+3i)</code>, or <code>conj(5-2i)</code>. Physical keyboard works too — Enter to evaluate, Esc to clear.</p>
+  </section>
+
+  <!-- ===================== ARGAND PLANE PANEL ===================== -->
+  <section class="panel plane-panel" aria-label="Argand plane">
+    <div class="plane-head">
+      <h2>Argand plane</h2>
+      <button class="ghost-btn" id="clearHistory">clear trail</button>
+    </div>
+    <svg id="plane" viewBox="0 0 320 320" role="img" aria-label="Complex plane plot of results"></svg>
+    <ul class="history" id="history"></ul>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <p>built with vanilla JS · no dependencies · <a href="https://github.com" target="_blank" rel="noopener">deploy on GitHub Pages</a></p>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
