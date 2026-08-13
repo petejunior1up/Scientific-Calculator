@@ -36,16 +36,16 @@
 
     <div class="keypad" id="keypad">
       <!-- row 1: functions -->
-      <button class="key key--fn" data-action="func" data-value="conj(">conj</button>
-      <button class="key key--fn" data-action="func" data-value="abs(">abs</button>
-      <button class="key key--fn" data-action="func" data-value="arg(">arg</button>
+      <button class="key key--fn key--fn-toggle" data-action="toggleFn" aria-expanded="false" aria-controls="fnPanel">ƒ(x)</button>
+      <button class="key" data-action="insert" data-value="(">(</button>
+      <button class="key" data-action="insert" data-value=")">)</button>
       <button class="key key--fn" data-action="clear">C</button>
       <button class="key key--fn" data-action="back" aria-label="Backspace">⌫</button>
 
       <!-- row 2 -->
-      <button class="key" data-action="insert" data-value="(">(</button>
-      <button class="key" data-action="insert" data-value=")">)</button>
       <button class="key key--imag" data-action="insert" data-value="i">i</button>
+      <button class="key" data-action="insert" data-value="pi">π</button>
+      <button class="key" data-action="insert" data-value="e">e</button>
       <button class="key key--op" data-action="insert" data-value="^">^</button>
       <button class="key key--op" data-action="insert" data-value="/">÷</button>
 
@@ -71,7 +71,9 @@
       <button class="key" data-action="insert" data-value=".">.</button>
     </div>
 
-    <p class="hint">Type expressions like <code>3+4i</code>, <code>(2-i)*(1+3i)</code>, or <code>conj(5-2i)</code>. Physical keyboard works too — Enter to evaluate, Esc to clear.</p>
+    <div class="fn-panel" id="fnPanel" hidden></div>
+
+    <p class="hint">Type expressions like <code>3+4i</code>, <code>(2-i)*(1+3i)</code>, or <code>sqrt(-1)</code>. Tap <strong>ƒ(x)</strong> for the full function list. Physical keyboard works too — Enter to evaluate, Esc to clear.</p>
   </section>
 
   <!-- ===================== ARGAND PLANE PANEL ===================== -->
