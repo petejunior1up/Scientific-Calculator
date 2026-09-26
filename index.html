@@ -34,6 +34,17 @@
       <div class="display-result" id="result"></div>
     </div>
 
+    <div class="quick-functions" id="quickFunctions" aria-label="Quick scientific functions">
+      <button type="button" class="quick-key" data-value="sin(">sin</button>
+      <button type="button" class="quick-key" data-value="cos(">cos</button>
+      <button type="button" class="quick-key" data-value="tan(">tan</button>
+      <button type="button" class="quick-key" data-value="ln(">ln</button>
+      <button type="button" class="quick-key" data-value="log10(">log</button>
+      <button type="button" class="quick-key" data-value="sqrt(">√</button>
+      <button type="button" class="quick-key" data-value="sq(">x²</button>
+      <button type="button" class="quick-key" data-value="fact(">x!</button>
+    </div>
+
     <div class="keypad" id="keypad">
       <!-- row 1: functions -->
       <button class="key key--fn key--fn-toggle" data-action="toggleFn" aria-expanded="false" aria-controls="fnPanel">ƒ(x)</button>
@@ -73,7 +84,7 @@
 
     <div class="fn-panel" id="fnPanel" hidden></div>
 
-    <p class="hint">Type expressions like <code>3+4i</code>, <code>(2-i)*(1+3i)</code>, or <code>sqrt(-1)</code>. Tap <strong>ƒ(x)</strong> for the full function list. Physical keyboard works too — Enter to evaluate, Esc to clear.</p>
+    <p class="hint">Type expressions like <code>3+4i</code>, <code>(2-i)*(1+3i)</code>, or <code>sqrt(-1)</code>. Use the quick keys or tap <strong>ƒ(x)</strong> for the expanded function library. Physical keyboard works too — Enter to evaluate, Esc to clear.</p>
   </section>
 
 </main>
