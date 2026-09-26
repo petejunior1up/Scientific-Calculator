@@ -372,13 +372,10 @@ function evaluateExpression(input) {
 const exprEl = document.getElementById('expr');
 const resultEl = document.getElementById('result');
 const keypad = document.getElementById('keypad');
-const historyEl = document.getElementById('history');
-const clearHistoryBtn = document.getElementById('clearHistory');
 const fnPanel = document.getElementById('fnPanel');
 const fnToggleBtn = document.querySelector('[data-action="toggleFn"]');
 
 let expression = '';
-let history = []; // { expr, complex }
 
 function renderExpr() {
   exprEl.textContent = expression || '0';
@@ -409,22 +406,9 @@ function evaluate() {
   try {
     const value = evaluateExpression(expression);
     resultEl.innerHTML = `${formatComplex(value)}<span class="polar">${formatPolar(value)}</span>`;
-    history.unshift({ expr: expression, complex: value });
-    history = history.slice(0, 12);
-    renderHistory();
-    plotResult(value, true);
   } catch (err) {
     showError(err.message);
   }
-}
-
-function renderHistory() {
-  historyEl.innerHTML = '';
-  history.forEach((h) => {
-    const li = document.createElement('li');
-    li.innerHTML = `<span class="h-expr">${h.expr}</span><span class="h-val">${formatComplex(h.complex, 3)}</span>`;
-    historyEl.appendChild(li);
-  });
 }
 
 keypad.addEventListener('click', (e) => {
@@ -482,121 +466,3 @@ window.addEventListener('keydown', (e) => {
   if (e.key === 'Backspace') { backspace(); return; }
   if (e.key === 'Escape') { clearAll(); return; }
 });
-
-clearHistoryBtn.addEventListener('click', () => {
-  history = [];
-  renderHistory();
-  redrawPlane(null);
-});
-
-/* ==========================================================================
-   5. ARGAND PLANE (SVG)
-   ========================================================================== */
-
-const NS = 'http://www.w3.org/2000/svg';
-const plane = document.getElementById('plane');
-const SIZE = 320;
-
-function svgEl(tag, attrs) {
-  const el = document.createElementNS(NS, tag);
-  for (const k in attrs) el.setAttribute(k, attrs[k]);
-  return el;
-}
-
-function currentRange() {
-  const mags = history.map((h) => Math.max(Math.abs(h.complex.re), Math.abs(h.complex.im)));
-  const maxMag = mags.length ? Math.max(...mags) : 0;
-  return Math.max(4, Math.ceil(maxMag * 1.25));
-}
-
-function toXY(re, im, range) {
-  const scale = (SIZE / 2 - 24) / range;
-  return { x: SIZE / 2 + re * scale, y: SIZE / 2 - im * scale };
-}
-
-function redrawPlane(justPlotted) {
-  plane.innerHTML = '';
-  const range = currentRange();
-
-  // grid lines
-  for (let g = -range; g <= range; g++) {
-    if (g === 0) continue;
-    const p1 = toXY(g, -range, range);
-    const p2 = toXY(g, range, range);
-    plane.appendChild(svgEl('line', {
-      x1: p1.x, y1: p1.y, x2: p2.x, y2: p2.y,
-      stroke: 'rgba(140,160,220,0.08)', 'stroke-width': 1
-    }));
-    const q1 = toXY(-range, g, range);
-    const q2 = toXY(range, g, range);
-    plane.appendChild(svgEl('line', {
-      x1: q1.x, y1: q1.y, x2: q2.x, y2: q2.y,
-      stroke: 'rgba(140,160,220,0.08)', 'stroke-width': 1
-    }));
-  }
-
-  // axes
-  const xAxis1 = toXY(-range, 0, range), xAxis2 = toXY(range, 0, range);
-  const yAxis1 = toXY(0, -range, range), yAxis2 = toXY(0, range, range);
-  plane.appendChild(svgEl('line', { x1: xAxis1.x, y1: xAxis1.y, x2: xAxis2.x, y2: xAxis2.y, stroke: 'rgba(140,160,220,0.35)', 'stroke-width': 1 }));
-  plane.appendChild(svgEl('line', { x1: yAxis1.x, y1: yAxis1.y, x2: yAxis2.x, y2: yAxis2.y, stroke: 'rgba(140,160,220,0.35)', 'stroke-width': 1 }));
-
-  // axis labels
-  const reLabel = svgEl('text', { x: SIZE - 14, y: SIZE / 2 - 8, fill: '#4deaff', 'font-size': 11, 'font-family': 'JetBrains Mono, monospace', 'text-anchor': 'end' });
-  reLabel.textContent = 'Re';
-  plane.appendChild(reLabel);
-  const imLabel = svgEl('text', { x: SIZE / 2 + 8, y: 16, fill: '#9b6bff', 'font-size': 11, 'font-family': 'JetBrains Mono, monospace' });
-  imLabel.textContent = 'Im';
-  plane.appendChild(imLabel);
-
-  // faded trail of past points (oldest → dimmest), skip index 0 (that's "current")
-  history.slice(1).forEach((h, idx) => {
-    const p = toXY(h.complex.re, h.complex.im, range);
-    const opacity = Math.max(0.08, 0.35 - idx * 0.03);
-    plane.appendChild(svgEl('circle', { cx: p.x, cy: p.y, r: 3, fill: '#4deaff', opacity }));
-  });
-
-  // current point + vector, animated
-  if (justPlotted) {
-    const p = toXY(justPlotted.re, justPlotted.im, range);
-    const origin = toXY(0, 0, range);
-
-    const vector = svgEl('line', {
-      x1: origin.x, y1: origin.y, x2: p.x, y2: p.y,
-      stroke: 'url(#vectorGradient)', 'stroke-width': 2, 'stroke-linecap': 'round'
-    });
-    plane.insertBefore(vector, plane.firstChild);
-
-    const defs = svgEl('defs', {});
-    const gradient = svgEl('linearGradient', { id: 'vectorGradient', x1: origin.x, y1: origin.y, x2: p.x, y2: p.y, gradientUnits: 'userSpaceOnUse' });
-    const stop1 = svgEl('stop', { offset: '0%', 'stop-color': '#9b6bff' });
-    const stop2 = svgEl('stop', { offset: '100%', 'stop-color': '#4deaff' });
-    gradient.appendChild(stop1);
-    gradient.appendChild(stop2);
-    defs.appendChild(gradient);
-    plane.appendChild(defs);
-
-    const dot = svgEl('circle', { cx: p.x, cy: p.y, r: 5, fill: '#4deaff' });
-    dot.style.filter = 'drop-shadow(0 0 6px #4deaff)';
-    dot.style.transformOrigin = `${p.x}px ${p.y}px`;
-    dot.style.animation = 'argand-pop 0.35s ease';
-    plane.appendChild(dot);
-  }
-}
-
-// keyframes for the "pop" animation, injected once
-const styleTag = document.createElement('style');
-styleTag.textContent = `
-@keyframes argand-pop {
-  0%   { transform: scale(0); opacity: 0; }
-  60%  { transform: scale(1.4); opacity: 1; }
-  100% { transform: scale(1); opacity: 1; }
-}`;
-document.head.appendChild(styleTag);
-
-function plotResult(complex) {
-  redrawPlane(complex);
-}
-
-/* initial empty plane */
-redrawPlane(null);
