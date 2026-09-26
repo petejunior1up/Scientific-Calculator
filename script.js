@@ -158,6 +158,8 @@ function tokenize(input) {
       const word = s.slice(i, j);
       if (word === 'i') tokens.push({ type: 'IMAG', value: 1 });
       else if (word === 'pi') tokens.push({ type: 'NUM', value: Math.PI });
+      else if (word === 'tau') tokens.push({ type: 'NUM', value: Math.PI * 2 });
+      else if (word === 'phi') tokens.push({ type: 'NUM', value: (1 + Math.sqrt(5)) / 2 });
       else if (word === 'e') tokens.push({ type: 'NUM', value: Math.E });
       else tokens.push({ type: 'FUNC', value: word });
       i = j;
@@ -174,6 +176,15 @@ function tokenize(input) {
   }
 
   return tokens;
+}
+
+function factorialComplex(z) {
+  if (z.im !== 0) throw new Error('Factorial requires a real number');
+  if (!Number.isInteger(z.re) || z.re < 0) throw new Error('Factorial requires a non-negative integer');
+  if (z.re > 170) throw new Error('Factorial is too large');
+  let out = 1;
+  for (let n = 2; n <= z.re; n++) out *= n;
+  return new Complex(out, 0);
 }
 
 /* ==========================================================================
@@ -195,6 +206,11 @@ const FUNCTION_GROUPS = [
       recip: { fn: (z) => z.recip(),                      desc: '1/z' },
       sign:  { fn: (z) => z.sign(),                       desc: 'unit direction' },
       sq:    { fn: (z) => z.mul(z),                       desc: 'z squared' },
+      cube:  { fn: (z) => z.mul(z).mul(z),                desc: 'z cubed' },
+      fourth:{ fn: (z) => z.pow(4),                       desc: 'z to the fourth' },
+      norm:  { fn: (z) => new Complex(z.re*z.re + z.im*z.im, 0), desc: '|z| squared' },
+      pct:   { fn: (z) => z.scale(0.01),                  desc: 'percentage / 100' },
+      fact:  { fn: (z) => factorialComplex(z),            desc: 'factorial n!' },
     },
   },
   {
@@ -204,8 +220,11 @@ const FUNCTION_GROUPS = [
       ln:    { fn: (z) => z.ln(),    desc: 'natural log' },
       log10: { fn: (z) => z.log10(), desc: 'log base 10' },
       log2:  { fn: (z) => z.log2(),  desc: 'log base 2' },
-      sqrt:  { fn: (z) => z.sqrt(),  desc: 'square root' },
-      cbrt:  { fn: (z) => z.cbrt(),  desc: 'cube root' },
+      sqrt:   { fn: (z) => z.sqrt(),                         desc: 'square root' },
+      cbrt:   { fn: (z) => z.cbrt(),                         desc: 'cube root' },
+      root4:  { fn: (z) => z.powReal(0.25),                  desc: 'principal fourth root' },
+      expm1:  { fn: (z) => z.exp().sub(new Complex(1, 0)),   desc: 'e^z - 1' },
+      log1p:  { fn: (z) => new Complex(1, 0).add(z).ln(),    desc: 'ln(1 + z)' },
     },
   },
   {
@@ -225,6 +244,9 @@ const FUNCTION_GROUPS = [
       asin: { fn: (z) => z.asin(), desc: 'arcsine' },
       acos: { fn: (z) => z.acos(), desc: 'arccosine' },
       atan: { fn: (z) => z.atan(), desc: 'arctangent' },
+      acot: { fn: (z) => z.recip().atan(), desc: 'inverse cotangent' },
+      asec: { fn: (z) => z.recip().acos(), desc: 'inverse secant' },
+      acsc: { fn: (z) => z.recip().asin(), desc: 'inverse cosecant' },
     },
   },
   {
@@ -244,6 +266,18 @@ const FUNCTION_GROUPS = [
       asinh: { fn: (z) => z.asinh(), desc: 'inverse sinh' },
       acosh: { fn: (z) => z.acosh(), desc: 'inverse cosh' },
       atanh: { fn: (z) => z.atanh(), desc: 'inverse tanh' },
+      acoth: { fn: (z) => z.recip().atanh(), desc: 'inverse coth' },
+      asech: { fn: (z) => z.recip().acosh(), desc: 'inverse sech' },
+      acsch: { fn: (z) => z.recip().asinh(), desc: 'inverse csch' },
+    },
+  },
+  {
+    label: 'conversions / special',
+    fns: {
+      deg:   { fn: (z) => z.scale(180 / Math.PI), desc: 'radians to degrees' },
+      rad:   { fn: (z) => z.scale(Math.PI / 180), desc: 'degrees to radians' },
+      sinc:  { fn: (z) => (z.re === 0 && z.im === 0) ? new Complex(1, 0) : z.sin().div(z), desc: 'sin(z) / z' },
+      cis:   { fn: (z) => new Complex(0, 1).mul(z).exp(), desc: 'cos(z) + i sin(z)' },
     },
   },
   {
@@ -372,6 +406,7 @@ function evaluateExpression(input) {
 const exprEl = document.getElementById('expr');
 const resultEl = document.getElementById('result');
 const keypad = document.getElementById('keypad');
+const quickFunctions = document.getElementById('quickFunctions');
 const fnPanel = document.getElementById('fnPanel');
 const fnToggleBtn = document.querySelector('[data-action="toggleFn"]');
 
@@ -410,6 +445,12 @@ function evaluate() {
     showError(err.message);
   }
 }
+
+quickFunctions.addEventListener('click', (e) => {
+  const btn = e.target.closest('button.quick-key');
+  if (!btn) return;
+  insert(btn.dataset.value);
+});
 
 keypad.addEventListener('click', (e) => {
   const btn = e.target.closest('button.key');
